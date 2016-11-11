@@ -90,3 +90,7 @@ ENV/
 
 # PyCharm project settings
 .idea/
+
+# Assignment Submissions
+*.docx
+*.png
