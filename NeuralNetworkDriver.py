@@ -7,8 +7,8 @@ from ResultPlotter import ResultPlotter
 
 # Define the hidden layer sizes, the number of iterations for each size and the number of training iterations
 testing_iterations = 10
-training_iterations_list = [100, 200, 300, 400, 500]  # , 1000, 2000, 5000, 10000]
-hidden_layer_sizes = range(2, 11, 1)
+training_iterations_list = [100, 500, 1000, 2000, 5000, 10000]
+hidden_layer_sizes = range(20, 51, 1)
 
 
 # Utility Methods

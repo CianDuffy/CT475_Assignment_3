@@ -42,7 +42,7 @@ class ResultPlotter(object):
 
         # Put a legend below current axis
         ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
-                  fancybox=True, shadow=True, ncol=5)
+                  fancybox=True, shadow=True, ncol=3)
 
         # plt.legend(loc='upper left')
         plt.savefig("ResultsComparison.png", format='png')
