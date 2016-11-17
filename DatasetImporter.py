@@ -28,12 +28,6 @@ def shuffle_and_split_list_with_ratio(input_list, ratio):
     return upper_list, lower_list
 
 
-def normalise_list(input_list):
-    """Normalises a list of floats"""
-    input_array = np.array(input_list)
-    return input_array / input_array.max(axis=0)
-
-
 class DatasetImporter(object):
 
     def __init__(self, filepath):
@@ -52,9 +46,6 @@ class DatasetImporter(object):
         self.training_data, self.training_target = self.split_data_and_target_lists(self.training_set)
         self.testing_data, self.testing_target = self.split_data_and_target_lists(self.testing_set)
 
-        self.training_data = normalise_list(self.training_data)
-        self.testing_data = normalise_list(self.testing_data)
-
     @staticmethod
     def split_data_and_target_lists(input_list):
         """Splits a list of training examples into data and target lists"""
@@ -67,4 +58,4 @@ class DatasetImporter(object):
             data.append(temp_data)
             target.append(row[len(row) - 1])
 
-        return np.array(data).astype(np.float), np.array(target)
+        return np.array(data), np.array(target)
