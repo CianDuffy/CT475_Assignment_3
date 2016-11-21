@@ -95,3 +95,7 @@ ENV/
 *.docx
 *.png
 *.xlsx
+Report
+Graphs
+Datasets
+*.csv

@@ -1,18 +1,18 @@
 import matplotlib
 matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 
 
 class ResultPlotter(object):
     def __init__(self, x_values, y_values, y_errors, iterations, baseline, filename):
-        """Creates a scatter plot with error bars
-
-
-        Keyword Arguments:
-        x_values -- values for x-axis
-        y_values -- values for y-axis
-        y_errors -- standard error in the y-axis values
-        iterations -- number of training iterations used to build classifier
-        baseline -- baseline accuracy for dataset
+        """
+        Class that uses matplotlib to generate line plots based on the accuracy and exports them to .png files
+        :param x_values: Number of hidden units
+        :param y_values: Mean prediction accuracy
+        :param y_errors: Standard error in the prediction
+        :param iterations: Number of training iterations
+        :param baseline: Minimum accuracy value
+        :param filename: Name of the dataset file
         """
 
         self.x_values = x_values
@@ -23,19 +23,26 @@ class ResultPlotter(object):
         self.filename = filename
 
     def generate_combined_plot(self, x_values, y_value_sets, iterations):
-        fig = matplotlib.figure()
+        """
+        Creates a plot comparing the mean accuracy values for different numbers of hidden units
+        :param x_values: Number of units in the hidden layer
+        :param y_value_sets: List of the mean accuracy values for each number of hidden units for each iteration number
+        :param iterations: Iteration numbers
+        :return: None
+        """
+        fig = plt.figure()
         ax = fig.add_subplot(111)
 
         for index in range(0, len(y_value_sets), 1):
             label = str(iterations[index]) + " Iterations"
             ax.plot(x_values, y_value_sets[index], label=label)
 
-        matplotlib.title("Neural Network Classification Accuracy vs Hidden\nLayer Dimensionality: Comparison")
-        matplotlib.xlabel("Number of Nodes in Hidden Layer")
-        matplotlib.ylabel("Mean Classification Accuracy with Standard Error")
-        matplotlib.ylim([-0.1, 1.1])
-        matplotlib.xlim([-0.25 * max(x_values), 1.25 * max(x_values)])
-        matplotlib.grid()
+        plt.title("Neural Network Classification Accuracy vs Hidden\nLayer Dimensionality: Comparison")
+        plt.xlabel("Number of units in Hidden Layer")
+        plt.ylabel("Mean Classification Accuracy with Standard Error")
+        plt.ylim([-0.1, 1.1])
+        plt.xlim([-0.25 * max(x_values), 1.25 * max(x_values)])
+        plt.grid()
 
         box = ax.get_position()
 
@@ -47,24 +54,29 @@ class ResultPlotter(object):
                   fancybox=True, shadow=True, ncol=3)
 
         # plt.legend(loc='upper left')
-        matplotlib.savefig("ResultsComparison_" + self.filename + ".png", format='png')
+        plt.savefig("ResultsComparison_" + self.filename + ".png", format='png')
 
     def generate_plot_with_errors(self):
+        """
+        Creates a plot of the mean prediction accuracy for each hidden layer size with error bars showing the standard
+        error
+        :return: None
+        """
         print "Plotting Results"
-        matplotlib.figure()
-        matplotlib.errorbar(self.x_values, self.y_values, yerr=self.y_errors)
-        matplotlib.axhline(self.baseline, c="r")
+        plt.figure()
+        plt.errorbar(self.x_values, self.y_values, yerr=self.y_errors)
+        plt.axhline(self.baseline, c="r")
 
         print "adding plot labels"
-        matplotlib.title("Neural Network Classification Accuracy for " + str(self.iterations) + " Iterations")
-        matplotlib.xlabel("Number of Nodes in Hidden Layer")
-        matplotlib.ylabel("Mean Classification Accuracy with Standard Error")
+        plt.title("Neural Network Classification Accuracy for " + str(self.iterations) + " Iterations")
+        plt.xlabel("Number of Units in Hidden Layer")
+        plt.ylabel("Mean Classification Accuracy with Standard Error")
 
         print "Updating plot limits"
-        matplotlib.ylim([-0.1, 1.1])
-        matplotlib.xlim([0, 1.1 * max(self.x_values)])
-        matplotlib.grid()
+        plt.ylim([-0.1, 1.1])
+        plt.xlim([0, 1.1 * max(self.x_values)])
+        plt.grid()
 
         print "displaying plot"
         name_template = "Results{0:02d}Iterations_" + self.filename + ".png"
-        matplotlib.savefig(name_template.format(self.iterations), format='png')
+        plt.savefig(name_template.format(self.iterations), format='png')

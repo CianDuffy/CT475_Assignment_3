@@ -1,17 +1,16 @@
 import Tkinter
 from tkFileDialog import askopenfilename
-
 import ntpath
-
 import numpy as np
-
 from NeuralNetworkDriver import NeuralNetworkDriver
-from NeuralNetworkTester import NeuralNetworkTester
 
 
 class NeuralNetworkGUI(object):
     def __init__(self):
-        # Initialise main window
+        """
+        GUI Class for the Neural Network Classifier
+        Allows the user to import datasets, classify them with the Neural Network Classifier and view the results
+        """
         self.main_window = Tkinter.Tk()
         self.main_window.wm_title("Artificial Neural Network")
         self.main_window.resizable(width=False, height=False)
@@ -39,9 +38,13 @@ class NeuralNetworkGUI(object):
         self.main_window.mainloop()
 
     def on_click_import_button(self):
+        """
+        Action for when import button is pressed
+        :return: None
+        """
         opts = {'filetypes': [('CSV files', '.csv')]}
         self.filepath = askopenfilename(**opts)  # show an "Open" dialog box and return the path to the selected file
-        self.filename = self.get_filename_from_path(self.filepath)
+        self.filename = ntpath.basename(self.filepath)
         if self.filename != "":
 
             self.top_label_text.set(self.filename + " successfully imported")
@@ -52,36 +55,35 @@ class NeuralNetworkGUI(object):
 
             bottom_buttons_y_position = (float_height - 20.0) / float_height
             reset_button_x_position = 20.0 / float_width
-            test_button_x_position = (float_width - 20.0) / float_width
+            classify_button_x_position = (float_width - 20.0) / float_width
 
             self.reset_button = Tkinter.Button(self.main_window, text="Reset", command=self.on_click_reset_button)
             self.reset_button.place(relx=reset_button_x_position, rely=bottom_buttons_y_position, anchor="sw")
 
             self.classify_button = Tkinter.Button(self.main_window, text=("Classify " + self.filename),
                                                   command=self.on_click_classify_button)
-            self.classify_button.place(relx=0.5, rely=bottom_buttons_y_position, anchor="s")
-
-            self.test_button = Tkinter.Button(self.main_window, text=("Test " + self.filename),
-                                              command=self.on_click_test_button)
-            self.test_button.place(relx=test_button_x_position, rely=bottom_buttons_y_position, anchor="se")
+            self.classify_button.place(relx=classify_button_x_position, rely=bottom_buttons_y_position, anchor="se")
 
     def on_click_classify_button(self):
+        """
+        Action for when classify button is pressed
+        :return: None
+        """
+
         self.reset_button.configure(state="disabled")
         self.classify_button.configure(state="disabled")
-        self.test_button.configure(state="disabled")
         self.top_label_text.set("Classifying " + self.filename + "...")
 
         self.main_window.after(500, self.begin_classification)
 
-    def on_click_test_button(self):
-        self.top_label_text.set("Testing network attributes using " + self.filename)
-        tester = NeuralNetworkTester(self.filepath)
-        tester.test_network_and_plot_results()
-
     def on_click_reset_button(self):
+        """
+        Action for when reset button is pressed
+        :return: None
+        """
+
         self.reset_button.destroy()
         self.classify_button.destroy()
-        self.test_button.destroy()
         self.classification_details_label.destroy()
         self.classification_details_container.destroy()
 
@@ -95,10 +97,6 @@ class NeuralNetworkGUI(object):
         self.top_label_text.set("Import your dataset to get started")
 
     @staticmethod
-    def get_filename_from_path(filepath):
-        return ntpath.basename(filepath)
-
-    @staticmethod
     def matched_result_list_for_input_lists(target, result):
         matched_list = []
         for index in range(0, len(target), 1):
@@ -110,23 +108,34 @@ class NeuralNetworkGUI(object):
         return np.array(matched_list)
 
     def begin_classification(self):
+        """
+        Passes a reference to the dataset to a NeuralNetworkDriver and displays the results
+        :return: None
+        """
+
+        # Initialise NeuralNetworkDriver and have it build, train and test the Network
         driver = NeuralNetworkDriver(self.filepath)
         self.final_results = driver.build_network_and_classify_data()
 
+        # Display the classification results in the GUI window
         self.display_classification_results()
 
         accuracy_sum = 0
         for result_dictionary in self.final_results:
             accuracy_sum += float(result_dictionary['accuracy'])
 
+        # Calculate the mean accuracy and display it for the user
         mean_accuracy = accuracy_sum / len(self.final_results)
         self.reset_button.configure(state="normal")
         self.classify_button.configure(state="normal")
-        self.test_button.configure(state="normal")
         self.top_label_text.set("Classification complete!\nMean accuracy: " + str(round(100 * mean_accuracy, 2)) + "%")
         self.main_window.mainloop()
 
     def display_classification_results(self):
+        """
+        Displays the results from the classification in a Tkinter text area
+        :return: None
+        """
         self.classification_details_label = Tkinter.Label(self.main_window, text="Classification Details:",
                                                           font=("Helvetica", 16))
         self.classification_details_label.pack(anchor="w", pady=10, padx=20)
@@ -166,10 +175,16 @@ class NeuralNetworkGUI(object):
 
     @staticmethod
     def inline_string_for_array(input_array):
+        """
+        Converts an array into an inline string of values separated by commas
+        :param input_array: Array of items to be added to string
+        :return: Inline string of values separated by commas
+        """
         inline_string = ""
         index = 1
         for entry in input_array:
             inline_string += entry
+            # Add a comma for all but the last entry
             if index < len(input_array):
                 inline_string += ", "
             index += 1

@@ -3,7 +3,7 @@ import ntpath
 
 import numpy as np
 import scipy.stats
-from DatasetImporter import DatasetImporter
+from CSVFileDelegate import CSVFileDelegate
 from NeuralNetworkClassifier import NeuralNetworkClassifier
 from ResultPlotter import ResultPlotter
 
@@ -12,13 +12,12 @@ class NeuralNetworkTester(object):
     def __init__(self, filepath):
         self.filepath = filepath
 
-        self.testing_iterations = 10
         self.training_iterations_list = range(1000, 11000, 1000)
         self.hidden_layer_sizes = range(5, 55, 5)
 
         self.baseline_accuracy = self.calculate_accuracy_baseline(self.filepath)
+        self.test_network_and_plot_results()
 
-    @staticmethod
     def test_network_and_plot_results(self):
         accuracy_results = []
         for training_iterations in self.training_iterations_list:
@@ -36,22 +35,22 @@ class NeuralNetworkTester(object):
                 print "Testing network with hidden layer size: " + str(hidden_layer_size)
                 # The Neural network is trained and tested for the specified number of iterations for each
                 # hidden layer size value
-                for i in range(0, self.testing_iterations + 1, 1):
+                for i in range(0, 10, 1):
                     # Reinitialise dataset importer object
-                    dataset_importer = DatasetImporter('owls15.csv')
+                    csv_delegate = CSVFileDelegate(self.filepath)
 
                     # Initialise Neural Network Classifier with data and target from data importer
-                    neural_network_classifier = NeuralNetworkClassifier(dataset_importer.training_data,
-                                                                        dataset_importer.training_target)
+                    neural_network_classifier = NeuralNetworkClassifier(csv_delegate.training_data,
+                                                                        csv_delegate.training_target)
 
                     # Build and train network with <hidden_layer_size> nodes in the hidden layer
                     neural_network_classifier.build_network(hidden_layer_size, training_iterations)
 
                     # Use classifier to classify testing data
-                    results = neural_network_classifier.classify_set(dataset_importer.testing_data)
+                    results = neural_network_classifier.classify_set(csv_delegate.testing_data)
 
                     # Compare results to testing target
-                    accuracy = self.compare_result_to_target(results, dataset_importer.testing_target)
+                    accuracy = self.compare_result_to_target(results, csv_delegate.testing_target)
                     accuracy_cache.append(accuracy)
                     print accuracy
 
@@ -72,10 +71,10 @@ class NeuralNetworkTester(object):
     def calculate_accuracy_baseline(filename):
         """Calculates the baseline accuracy for the dataset in question"""
         # Initialises DatasetImporterObject
-        dataset_importer = DatasetImporter(filename)
+        csv_delegate = CSVFileDelegate(filename)
 
         # Separates the target classes from the input data
-        data, target = dataset_importer.split_data_and_target_lists(dataset_importer.full_data_list)
+        data, target = csv_delegate.split_data_and_target_lists(csv_delegate.full_data_list)
 
         target_classes = {}
         for entry in target:
@@ -109,6 +108,7 @@ class NeuralNetworkTester(object):
 
     @staticmethod
     def target_is_categorical(target):
+        """Returns true the data is categorical rather than numerical"""
         result = True
         # noinspection PyBroadException
         try:
