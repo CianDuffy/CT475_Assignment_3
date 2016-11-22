@@ -47,14 +47,14 @@ class ResultPlotter(object):
         box = ax.get_position()
 
         ax.set_position([box.x0, box.y0 + box.height * 0.1,
-                         box.width, box.height * 0.9])
+                         box.width, box.height * 0.8])
 
         # Put a legend below current axis
         ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
                   fancybox=True, shadow=True, ncol=3)
 
         # plt.legend(loc='upper left')
-        plt.savefig("ResultsComparison_" + self.filename + ".png", format='png')
+        plt.savefig("Graphs/ResultsComparison_" + self.filename + ".png", format='png')
 
     def generate_plot_with_errors(self):
         """
@@ -78,5 +78,32 @@ class ResultPlotter(object):
         plt.grid()
 
         print "displaying plot"
-        name_template = "Results{0:02d}Iterations_" + self.filename + ".png"
+        name_template = "Graphs/Results{0:02d}Iterations_" + self.filename + ".png"
         plt.savefig(name_template.format(self.iterations), format='png')
+
+    @staticmethod
+    def generate_learning_rate_plot_with_errors(x_values, y_values, y_errors):
+        """
+        Creates a plot of the mean prediction accuracy for eachlearning rate value with error bars showing the standard
+        error
+        :return: None
+        """
+        print "Plotting Results"
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.errorbar(x_values, y_values, yerr=y_errors)
+
+        print "adding plot labels"
+        plt.title("Neural Network Classification Accuracy")
+        plt.xlabel("Learning Rate")
+        plt.ylabel("Mean Classification Accuracy with Standard Error")
+
+        print "Updating plot limits"
+        plt.ylim([0, 1.1])
+        ax.set_xscale('log')
+        plt.xlim([0, 1.1 * max(x_values)])
+        plt.grid()
+
+        print "displaying plot"
+        name_template = "Graphs/Learning_Rates.png"
+        plt.savefig(name_template, format='png')
