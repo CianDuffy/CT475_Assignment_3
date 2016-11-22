@@ -12,11 +12,11 @@ class NeuralNetworkTester(object):
     def __init__(self, filepath):
         self.filepath = filepath
 
-        self.training_iterations_list = range(1000, 11000, 1000)
-        self.hidden_layer_sizes = range(5, 55, 5)
+        self.training_iterations_list = [100, 300, 500, 750, 1000, 2000, 3000, 4000, 5000]
+        self.hidden_layer_sizes = range(1, 31, 1)
+        self.learning_rates = [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
 
         self.baseline_accuracy = self.calculate_accuracy_baseline(self.filepath)
-        self.test_network_and_plot_results()
 
     def test_network_and_plot_results(self):
         accuracy_results = []
@@ -65,6 +65,50 @@ class NeuralNetworkTester(object):
             accuracy_results.append(mean_accuracies)
         if plotter:
             plotter.generate_combined_plot(self.hidden_layer_sizes, accuracy_results, self.training_iterations_list)
+
+    def test_learning_rates(self):
+        mean_accuracies = []
+        standard_errors = []
+        best_mean_accuracy = 0.0
+        best_learning_rate = 0.0
+        for learning_rate in self.learning_rates:
+            # initialise list to store accuracy results
+            accuracy_cache = []
+
+            print "Testing network with learning rate: " + str(learning_rate)
+            # The Neural network is trained and tested for the specified number of iterations for each
+            # hidden layer size value
+            for i in range(0, 10, 1):
+                # Reinitialise dataset importer object
+                csv_delegate = CSVFileDelegate("Datasets/owls15.csv")
+
+                # Initialise Neural Network Classifier with data and target from data importer
+                neural_network_classifier = NeuralNetworkClassifier(csv_delegate.training_data,
+                                                                    csv_delegate.training_target)
+
+                # Build and train network with <hidden_layer_size> nodes in the hidden layer
+                neural_network_classifier.build_network(3, 2000, learning_rate)
+
+                # Use classifier to classify testing data
+                results = neural_network_classifier.classify_set(csv_delegate.testing_data)
+
+                # Compare results to testing target
+                accuracy = self.compare_result_to_target(results, csv_delegate.testing_target)
+                accuracy_cache.append(accuracy)
+                print accuracy
+
+            # Store the mean and standard error values for each set of results
+            mean_accuracy = (float(sum(accuracy_cache)) / 10)
+            if mean_accuracy > best_mean_accuracy:
+                best_mean_accuracy = mean_accuracy
+                best_learning_rate = learning_rate
+
+            mean_accuracies.append(mean_accuracy)
+            standard_errors.append(scipy.stats.sem(accuracy_cache))
+
+        print "Best learning rate = " + str(best_learning_rate)
+        plotter = ResultPlotter(self.learning_rates, mean_accuracies, standard_errors, 0, 0, "Datasets/owls15.csv")
+        plotter.generate_learning_rate_plot_with_errors(self.learning_rates, mean_accuracies, standard_errors)
 
     # Utility Methods
     @staticmethod

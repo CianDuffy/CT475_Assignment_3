@@ -31,7 +31,7 @@ class NeuralNetworkDriver(object):
 
             # Initialise Neural Network Classifier with 30 hidden units and train it for 5000 iterations
             neural_network = NeuralNetworkClassifier(csv_delegate.training_data, csv_delegate.training_target)
-            neural_network.build_network(30, 5000)
+            neural_network.build_network(30, 5000, 0.05)
 
             # Store results and calculate accuracy
             results = neural_network.classify_set(csv_delegate.testing_data)

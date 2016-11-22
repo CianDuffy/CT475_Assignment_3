@@ -37,7 +37,7 @@ class NeuralNetworkClassifier(object):
         # learning rate for updating network values
         self.epsilon = 0.01
 
-    def build_network(self, hidden_layer_size, iterations):
+    def build_network(self, hidden_layer_size, iterations, learning_rate):
         """Builds and trains a Neural Network Classifier
 
 
@@ -47,6 +47,7 @@ class NeuralNetworkClassifier(object):
         """
         # Assign value of hidden layer size
         self.hidden_layer_size = hidden_layer_size
+        self.epsilon = learning_rate
 
         # Initialise Weight matrices to random values.
         np.random.seed(0)
