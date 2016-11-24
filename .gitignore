@@ -94,3 +94,8 @@ ENV/
 # Assignment Submissions
 *.docx
 *.png
+*.xlsx
+Report
+Graphs
+Datasets
+*.csv
